@@ -1,0 +1,78 @@
+---
+title: "report"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('plotly')
+library('readxl')
+```
+
+# By nutri 
+
+## Load Data
+
+```{r}
+otu_phylum <- read_excel("/Users/ziyi/Desktop/Thesis/otu-phylum.xlsx")
+dat <- as.data.frame(otu_phylum)
+dat
+```
+
+## Convert to row table
+
+```{r}
+breast.dat <- dat[,2:11]  
+formula.dat <- dat[,12:21]
+bac.names <- c(rep(dat[1,1],10),rep(dat[2,1],10),rep(dat[3,1],10),rep(dat[4,1],10))
+breast.dat.as.vector <- unlist(c(breast.dat))
+formula.dat.as.vector <- unlist(c(formula.dat))
+
+otu <- c(breast.dat.as.vector, formula.dat.as.vector)
+names(otu) <- NULL
+
+nutri <- c(rep('breastmilk', 40),rep('formulamilk',40))
+bac.names <- c( bac.names, bac.names )
+
+
+all.dat <- cbind(otu,nutri,bac.names)
+
+all.dat <- as.data.frame(all.dat)
+all.dat$otu <- as.character(all.dat$otu)
+all.dat$otu <- as.numeric(all.dat$otu)
+all.dat$bac.names <- factor(all.dat$bac.names, levels=c("k__Bacteria;p__Firmicutes", "k__Bacteria;p__Proteobacteria", "k__Bacteria;p__Actinobacteria", "k__Bacteria;p__Bacteroidetes"))
+all.dat
+```
+
+## Plot data
+
+```{r warning=FALSE}
+
+plot_ly(all.dat, y =~otu, color =~ nutri, x=~bac.names, type = 'box') %>%
+  layout(boxmode='group')
+
+```
+
+
+# By anti or not
+
+## Load Data
+
+```{r}
+otu_phylum <- read_excel("/Users/ziyi/Desktop/Thesis/otuphylum-antibiotics.xlsx")
+dat <- as.data.frame(otu_phylum)
+dat$bac.name <- factor(dat$bac.name, levels=c("k__Bacteria;p__Firmicutes", "k__Bacteria;p__Proteobacteria", "k__Bacteria;p__Actinobacteria", "k__Bacteria;p__Bacteroidetes"))
+levels(dat$bac.name)
+
+```
+
+## Plot data
+
+```{r warning=FALSE}
+
+
+
+plot_ly(dat, y =~out, color =~ Antibiotic, x=~bac.name, type = 'box') %>%
+  layout(boxmode='group')
+
+```
